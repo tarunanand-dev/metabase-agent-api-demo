@@ -14,13 +14,6 @@ function signJwt(): string {
 async function agentRequest(path: string, options?: RequestInit) {
   const token = signJwt();
   const url = `${METABASE_URL()}/api/agent${path}`;
-  const method = options?.method ?? "GET";
-
-  console.log(`[metabase] ${method} ${url}`);
-  console.log(`[metabase]   JWT payload: ${JSON.stringify(jwt.decode(token))}`);
-  if (options?.body) {
-    console.log(`[metabase]   Request body: ${options.body}`);
-  }
 
   const response = await fetch(url, {
     ...options,
@@ -34,11 +27,9 @@ async function agentRequest(path: string, options?: RequestInit) {
   const body = await response.text();
 
   if (!response.ok) {
-    console.error(`[metabase]   Response ${response.status}: ${body}`);
     throw new Error(`Metabase API ${response.status}: ${body}`);
   }
 
-  console.log(`[metabase]   Response ${response.status}: ${body}`);
   return JSON.parse(body);
 }
 
@@ -133,32 +124,10 @@ export async function constructQuery(query: Record<string, unknown>) {
 }
 
 export async function executeQuery(encodedQuery: string) {
-  // LLMs sometimes include stray quotes around the base64 query string
-  const cleanQuery = encodedQuery.replace(/^"+|"+$/g, "");
-
-  const token = signJwt();
-  const url = `${METABASE_URL()}/api/agent/v1/execute`;
-  const requestBody = JSON.stringify({ query: cleanQuery });
-
-  console.log(`[metabase] POST ${url}`);
-  console.log(`[metabase]   JWT payload: ${JSON.stringify(jwt.decode(token))}`);
-  console.log(`[metabase]   Request body: ${requestBody}`);
-  if (cleanQuery !== encodedQuery) {
-    console.log(`[metabase]   (stripped stray quotes from query string)`);
-  }
-
-  const response = await fetch(url, {
+  const result = await agentRequest("/v1/execute", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: requestBody,
+    body: JSON.stringify({ query: encodedQuery }),
   });
-
-  const responseBody = await response.text();
-  console.log(`[metabase]   Response ${response.status}: ${responseBody}`);
-  const result = JSON.parse(responseBody);
 
   // /v1/execute always returns 202; check the body for actual status
   return {

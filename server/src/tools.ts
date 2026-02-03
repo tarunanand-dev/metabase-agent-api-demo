@@ -2,21 +2,6 @@ import { tool } from "ai";
 import { z } from "zod";
 import * as metabase from "./metabase.js";
 
-// In-memory store so the LLM never handles raw base64 query strings.
-// Maps short IDs like "q1", "q2" to the encoded query from construct-query.
-const queryStore = new Map<string, string>();
-let queryCounter = 0;
-
-function storeQuery(encoded: string): string {
-  const id = `q${++queryCounter}`;
-  queryStore.set(id, encoded);
-  return id;
-}
-
-function resolveQuery(idOrEncoded: string): string {
-  return queryStore.get(idOrEncoded) ?? idOrEncoded;
-}
-
 const filterSchema = z.union([
   z.object({
     segment_id: z.number().describe("ID of a pre-defined segment"),
@@ -71,13 +56,8 @@ export const agentTools = {
         .optional()
         .describe("Natural-language queries (e.g. ['how much money did we make'])"),
     }),
-    execute: async ({ term_queries, semantic_queries }) => {
-      try {
-        return await metabase.search(term_queries, semantic_queries);
-      } catch (e) {
-        return { error: String(e) };
-      }
-    },
+    execute: ({ term_queries, semantic_queries }) =>
+      metabase.search(term_queries, semantic_queries),
   }),
 
   get_table_details: tool({
@@ -88,16 +68,11 @@ export const agentTools = {
       with_measures: z.boolean().optional().describe("Include reusable measure definitions"),
       with_segments: z.boolean().optional().describe("Include pre-defined segment filters"),
     }),
-    execute: async ({ table_id, with_measures, with_segments }) => {
-      try {
-        return await metabase.getTable(table_id, {
-          withMeasures: with_measures,
-          withSegments: with_segments,
-        });
-      } catch (e) {
-        return { error: String(e) };
-      }
-    },
+    execute: ({ table_id, with_measures, with_segments }) =>
+      metabase.getTable(table_id, {
+        withMeasures: with_measures,
+        withSegments: with_segments,
+      }),
   }),
 
   get_metric_details: tool({
@@ -107,15 +82,8 @@ export const agentTools = {
       metric_id: z.number().describe("Metric ID from search results"),
       with_segments: z.boolean().optional().describe("Include applicable segments"),
     }),
-    execute: async ({ metric_id, with_segments }) => {
-      try {
-        return await metabase.getMetric(metric_id, {
-          withSegments: with_segments,
-        });
-      } catch (e) {
-        return { error: String(e) };
-      }
-    },
+    execute: ({ metric_id, with_segments }) =>
+      metabase.getMetric(metric_id, { withSegments: with_segments }),
   }),
 
   get_field_values: tool({
@@ -127,18 +95,13 @@ export const agentTools = {
       field_id: z.string().describe("Field ID from the detail endpoint"),
       limit: z.number().optional().describe("Max number of sample values to return"),
     }),
-    execute: async ({ entity_type, entity_id, field_id, limit }) => {
-      try {
-        return await metabase.getFieldValues(entity_type, entity_id, field_id, limit);
-      } catch (e) {
-        return { error: String(e) };
-      }
-    },
+    execute: ({ entity_type, entity_id, field_id, limit }) =>
+      metabase.getFieldValues(entity_type, entity_id, field_id, limit),
   }),
 
-  construct_query: tool({
+  run_query: tool({
     description:
-      "Construct a Metabase query from a table or metric with optional filters, aggregations, grouping, and ordering. Returns a query_id to pass to execute_query. Provide exactly one of table_id or metric_id.",
+      "Build and execute a Metabase query in one step. Provide exactly one of table_id or metric_id. Returns column metadata and result rows.",
     parameters: z.object({
       table_id: z.number().optional().describe("Table ID (for table queries)"),
       metric_id: z.number().optional().describe("Metric ID (for metric queries)"),
@@ -156,32 +119,8 @@ export const agentTools = {
       limit: z.number().optional().describe("Maximum rows to return"),
     }),
     execute: async (params) => {
-      try {
-        const result = await metabase.constructQuery(params);
-        const queryId = storeQuery(result.query);
-        return { query_id: queryId };
-      } catch (e) {
-        return { error: String(e) };
-      }
-    },
-  }),
-
-  execute_query: tool({
-    description:
-      "Execute a query previously built by construct_query. Returns column metadata and result rows.",
-    parameters: z.object({
-      query_id: z.string().describe("The query_id returned by construct_query (e.g. 'q1')"),
-    }),
-    execute: async ({ query_id }) => {
-      try {
-        const encoded = resolveQuery(query_id);
-        if (encoded === query_id) {
-          return { error: `Unknown query_id: ${query_id}` };
-        }
-        return await metabase.executeQuery(encoded);
-      } catch (e) {
-        return { error: String(e) };
-      }
+      const { query } = await metabase.constructQuery(params);
+      return metabase.executeQuery(query);
     },
   }),
 };
