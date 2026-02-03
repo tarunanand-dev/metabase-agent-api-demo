@@ -8,8 +8,8 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^1.0.0",
-    "ai": "^4.0.0",
+    "@ai-sdk/anthropic": "^3.0.35",
+    "ai": "^6.0.68",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",

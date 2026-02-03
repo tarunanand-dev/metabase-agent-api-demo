@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
-import { type CoreMessage, streamText } from "ai";
+import { ToolLoopAgent, pipeAgentUIStreamToResponse, UIMessage, stepCountIs } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { systemPrompt } from "./prompt.js";
 import { agentTools } from "./tools.js";
@@ -18,38 +18,39 @@ app.use(express.json());
 
 const PORT = parseInt(process.env.SERVER_PORT || "3001");
 
-// Server-side conversation storage so tool results (which can be large)
-// never round-trip through the client.
-const conversations = new Map<string, CoreMessage[]>();
+// Verify required env vars
+const requiredEnvVars = ["METABASE_INSTANCE_URL", "METABASE_JWT_SHARED_SECRET", "METABASE_USER_EMAIL"];
+for (const v of requiredEnvVars) {
+  if (!process.env[v]) {
+    console.error(`Missing required environment variable: ${v}`);
+    process.exit(1);
+  }
+}
+
+const agent = new ToolLoopAgent({
+  model: anthropic("claude-sonnet-4-20250514"),
+  instructions: systemPrompt,
+  tools: agentTools,
+  stopWhen: stepCountIs(15),
+});
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
 app.post("/api/chat", async (req, res) => {
-  const { message, conversationId = "default" } = req.body;
+  const { messages, conversationId } = req.body;
 
-  if (!message || typeof message !== "string") {
-    res.status(400).json({ error: "Missing 'message' field" });
+  if (!messages || !Array.isArray(messages)) {
+    res.status(400).json({ error: "Missing 'messages' array" });
     return;
   }
 
-  const history = conversations.get(conversationId) ?? [];
-  history.push({ role: "user", content: message });
-
-  const result = streamText({
-    model: anthropic("claude-sonnet-4-20250514"),
-    system: systemPrompt,
-    messages: history,
-    tools: agentTools,
-    maxSteps: 15,
-    onFinish({ response }) {
-      history.push(...(response.messages as CoreMessage[]));
-      conversations.set(conversationId, history);
-    },
+  await pipeAgentUIStreamToResponse({
+    response: res,
+    agent,
+    uiMessages: messages as UIMessage[],
   });
-
-  result.pipeDataStreamToResponse(res);
 });
 
 app.listen(PORT, () => {
