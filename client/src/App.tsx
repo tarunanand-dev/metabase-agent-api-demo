@@ -257,21 +257,33 @@ export default function App() {
       </div>
 
       <form className="input-area" onSubmit={handleSubmit}>
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about your data&#x2026;"
-          disabled={isLoading}
-        />
-        {isLoading ? (
-          <button type="button" className="cancel-btn" onClick={handleCancel}>
-            Cancel
-          </button>
-        ) : (
-          <button type="submit" disabled={!input.trim()}>
-            Send
-          </button>
-        )}
+        <div className={`input-container ${isLoading ? "loading" : ""}`}>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about your data&#x2026;"
+            disabled={isLoading}
+          />
+          {isLoading ? (
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={handleCancel}
+              aria-label="Cancel"
+            >
+              &#9632;
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="send-btn"
+              disabled={!input.trim()}
+              aria-label="Send"
+            >
+              &#8593;
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );
