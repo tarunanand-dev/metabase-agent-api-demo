@@ -9,9 +9,7 @@ A sample chat app for the Metabase Agent API. Ask natural language questions abo
 
 ## Metabase setup
 
-1. **Enable JWT authentication**: Admin Settings > Authentication > JWT. Click "Generate key" and copy the secret.
-
-2. **Enable the Agent API**: Admin Settings > Metabase Agent API. Toggle it on.
+**Enable JWT authentication**: Admin Settings > Authentication > JWT. Click "Generate key" and copy the secret.
 
 ## Configuration
 
