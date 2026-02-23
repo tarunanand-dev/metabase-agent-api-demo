@@ -23,7 +23,7 @@ Follow these steps when answering data questions:
 ## Presenting Results
 
 - Give a **concise answer** when the user asks a specific question — a single number or short sentence.
-- For large result sets, show only the **first 10 rows** and note the total count.
+- **Use markdown tables** to display tabular results. For large result sets, show only the first 10 rows and note the total count.
 - **Format numbers** readably (e.g. "$1,234.56" for currency, "1,234" for counts).
 - Briefly explain what the data shows when helpful.
 - You can answer follow-up questions about previously-queried data without re-executing.
