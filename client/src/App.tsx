@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, UIMessage } from "ai";
 import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const TOOL_LABELS: Record<string, string> = {
   search_data_sources: "Searching for data sources",
@@ -139,7 +140,9 @@ export default function App() {
               {message.parts?.map((part, i) => {
                 if (part.type === "text") {
                   return part.text.length > 0 ? (
-                    <Markdown key={`${i}-${part.text.length}`}>{part.text}</Markdown>
+                    <Markdown key={`${i}-${part.text.length}`} remarkPlugins={[remarkGfm]}>
+                      {part.text}
+                    </Markdown>
                   ) : null;
                 }
                 if (part.type.startsWith("tool-") || part.type === "dynamic-tool") {

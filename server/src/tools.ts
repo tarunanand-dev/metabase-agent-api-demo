@@ -70,6 +70,8 @@ export const agentTools = {
     }),
     execute: async ({ table_id, with_measures, with_segments }) =>
       metabase.getTable(table_id, {
+        withFields: true,
+        withFieldValues: false, // Exclude field values to avoid context bloat
         withMeasures: with_measures,
         withSegments: with_segments,
       }),
@@ -93,10 +95,10 @@ export const agentTools = {
       entity_type: z.enum(["table", "metric"]).describe("Whether the field belongs to a table or metric"),
       entity_id: z.number().describe("Table or metric ID"),
       field_id: z.string().describe("Field ID from the detail endpoint"),
-      limit: z.number().optional().describe("Max number of sample values to return"),
+      limit: z.number().optional().describe("Max number of sample values to return (default: 30)"),
     }),
     execute: async ({ entity_type, entity_id, field_id, limit }) =>
-      metabase.getFieldValues(entity_type, entity_id, field_id, limit),
+      metabase.getFieldValues(entity_type, entity_id, field_id, limit ?? 30),
   }),
 
   run_query: tool({
@@ -116,10 +118,13 @@ export const agentTools = {
         .describe("Aggregations to apply (table queries only)"),
       group_by: z.array(groupBySchema).optional().describe("Group-by dimensions"),
       order_by: z.array(orderBySchema).optional().describe("Ordering (table queries only)"),
-      limit: z.number().optional().describe("Maximum rows to return"),
+      limit: z.number().optional().describe("Maximum rows to return (default: 100)"),
     }),
     execute: async (params) => {
-      const { query } = await metabase.constructQuery(params);
+      const { query } = await metabase.constructQuery({
+        ...params,
+        limit: params.limit ?? 100, // Default limit to avoid context bloat
+      });
       return metabase.executeQuery(query);
     },
   }),

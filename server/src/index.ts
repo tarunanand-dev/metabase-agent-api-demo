@@ -39,7 +39,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.post("/api/chat", async (req, res) => {
-  const { messages, conversationId } = req.body;
+  const { messages } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
     res.status(400).json({ error: "Missing 'messages' array" });
