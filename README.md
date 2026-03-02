@@ -34,3 +34,11 @@ npm run dev
 ```
 
 Open [http://localhost:3100](http://localhost:3100).
+
+## Reporting issues
+
+For bugs and feature requests, please [open an issue](https://github.com/metabase/metabase-agent-api-demo/issues). For security issues, please see our [Security Policy](https://github.com/metabase/metabase/security/policy).
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE).

@@ -19,7 +19,7 @@ app.use(express.json());
 const PORT = parseInt(process.env.SERVER_PORT || "3001");
 
 // Verify required env vars
-const requiredEnvVars = ["METABASE_INSTANCE_URL", "METABASE_JWT_SHARED_SECRET", "METABASE_USER_EMAIL"];
+const requiredEnvVars = ["METABASE_INSTANCE_URL", "METABASE_JWT_SHARED_SECRET", "METABASE_USER_EMAIL", "ANTHROPIC_API_KEY"];
 for (const v of requiredEnvVars) {
   if (!process.env[v]) {
     console.error(`Missing required environment variable: ${v}`);
