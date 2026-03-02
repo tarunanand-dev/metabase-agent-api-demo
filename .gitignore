@@ -1,2 +1,12 @@
 .env
+.env*.local
 node_modules
+dist
+build
+out
+*.log
+.DS_Store
+.claude
+.vscode
+.idea
+*.pem
