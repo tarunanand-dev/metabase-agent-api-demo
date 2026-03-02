@@ -140,7 +140,9 @@ export default function App() {
               {message.parts?.map((part, i) => {
                 if (part.type === "text") {
                   return part.text.length > 0 ? (
-                    <Markdown key={`${i}-${part.text.length}`} remarkPlugins={[remarkGfm]}>{part.text}</Markdown>
+                    <Markdown key={`${i}-${part.text.length}`} remarkPlugins={[remarkGfm]}>
+                      {part.text}
+                    </Markdown>
                   ) : null;
                 }
                 if (part.type.startsWith("tool-") || part.type === "dynamic-tool") {
