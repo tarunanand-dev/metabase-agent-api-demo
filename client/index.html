@@ -8,16 +8,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      function defineMetabaseConfig(config) {
-        window.metabaseConfig = config;
-      }
-      defineMetabaseConfig({
-        useExistingUserSession: true,
-        instanceUrl: "http://localhost:4040",
-      });
-    </script>
-    <script defer src="http://localhost:4040/app/embed.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

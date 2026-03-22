@@ -35,6 +35,18 @@ npm run dev
 
 Open [http://localhost:3100](http://localhost:3100).
 
+## Production build
+
+`METABASE_INSTANCE_URL` from the repo-root `.env` is mapped at build time to `import.meta.env.VITE_METABASE_INSTANCE_URL` (see `client/vite.config.ts` `define`). `main.tsx` uses that value for `window.metabaseConfig` and to load `embed.js`. Set the variable in the environment or `.env` **before** `vite build` / `npm run dev` so the client points at your real Metabase host.
+
+On the **Metabase** side, typical requirements are:
+
+- **CORS** — Allow your deployed app origin (or use a reverse proxy so the app and Metabase share an origin).
+- **HTTPS** — If the app is served over HTTPS, the Metabase URL should be HTTPS too so the browser does not block mixed content when loading `embed.js`.
+- **Embedding / interactive embedding** — Enable whatever your Metabase edition needs for the embedded browser and session behavior you use (`useExistingUserSession`, JWT SSO, etc.).
+
+The Node server still reads `METABASE_INSTANCE_URL` at **runtime** for API calls; keep that value aligned with what you used at build time unless you rebuild after changing hosts.
+
 ## Branding
 
 - **This app**: Replace assets in `client/public/` — `appice-logo-square.png` (left pane header) and `appice-icon.png` (chat header + favicon).
