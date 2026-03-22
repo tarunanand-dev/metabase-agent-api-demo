@@ -125,21 +125,21 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <section className="appice-pane" aria-label="Appice data browser">
-        <header className="pane-header">
+      <header className="app-top-header">
+        <div className="app-top-header-left">
           <img
-            className="pane-wordmark"
-            src="/appice-wordmark.png"
+            className="app-header-mark"
+            src="/appice-logo-square.png"
             alt="Appice"
-            width={120}
-            height={28}
+            width={36}
+            height={36}
           />
-        </header>
-        <metabase-browser initial-collection="root" read-only="false" />
-      </section>
-
-      <div className="chat-pane">
-        <header className="app-header">
+          <div className="app-header-titles">
+            <h1>Appice Analytics Browser</h1>
+            <p>Explore and visualize your data in real-time</p>
+          </div>
+        </div>
+        <div className="app-top-header-right app-header">
           <img
             className="app-header-mark"
             src="/appice-icon.png"
@@ -151,8 +151,15 @@ export default function App() {
             <h1>Appice Agent</h1>
             <p>Ask questions about your data</p>
           </div>
-        </header>
+        </div>
+      </header>
 
+      <div className="app-main">
+        <section className="appice-pane" aria-label="Appice Analytics Browser">
+          <metabase-browser initial-collection="root" read-only="false" />
+        </section>
+
+        <div className="chat-pane">
         <div className="messages">
         {messages.map((message) => (
           <div key={message.id} className={`message ${message.role}`}>
@@ -226,6 +233,7 @@ export default function App() {
           )}
         </div>
         </form>
+        </div>
       </div>
     </div>
   );

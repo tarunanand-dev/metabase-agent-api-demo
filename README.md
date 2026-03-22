@@ -37,7 +37,7 @@ Open [http://localhost:3100](http://localhost:3100).
 
 ## Branding
 
-- **This app**: Replace assets in `client/public/` — `appice-wordmark.png` (left pane header) and `appice-icon.png` (chat header + favicon).
+- **This app**: Replace assets in `client/public/` — `appice-logo-square.png` (left pane header) and `appice-icon.png` (chat header + favicon).
 - **Embedded browser** (`<metabase-browser>`): Still served by Metabase; its chrome (navbar, login, etc.) shows **Metabase** branding unless you [customize the Metabase deployment](https://www.metabase.com/docs/latest/configuring-metabase/customizing-jetty-webserver) (logo files, `application-name`, or a fork). White-labeling is done on the Metabase server, not only in this demo.
 
 ## Reporting issues
