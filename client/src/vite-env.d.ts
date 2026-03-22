@@ -14,8 +14,9 @@ interface ImportMeta {
 declare global {
   interface Window {
     metabaseConfig?: {
-      useExistingUserSession?: boolean;
       instanceUrl?: string;
+      preferredAuthMethod?: string;
+      fetchRequestToken?: () => Promise<{ jwt: string }>;
     };
   }
 }

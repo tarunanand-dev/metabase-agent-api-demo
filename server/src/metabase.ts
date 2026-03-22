@@ -5,7 +5,8 @@ const METABASE_URL = () => process.env.METABASE_INSTANCE_URL!.trim();
 const JWT_SECRET = () => process.env.METABASE_JWT_SHARED_SECRET!.trim();
 const USER_EMAIL = () => process.env.METABASE_USER_EMAIL!.trim();
 
-function signJwt(): string {
+/** Same claims as Agent API JWT; also used for modular embedding (`fetchRequestToken`). */
+export function signJwt(): string {
   const now = Math.floor(Date.now() / 1000);
   return jwt.sign(
     {

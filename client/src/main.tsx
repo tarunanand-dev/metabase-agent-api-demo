@@ -12,8 +12,18 @@ if (!instanceUrl) {
 }
 
 window.metabaseConfig = {
-  useExistingUserSession: true,
   instanceUrl,
+  preferredAuthMethod: "jwt",
+  fetchRequestToken: async () => {
+    const response = await fetch("/api/embed-token", { credentials: "include" });
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(
+        `Embed JWT failed (${response.status}): ${detail || response.statusText}`,
+      );
+    }
+    return response.json() as Promise<{ jwt: string }>;
+  },
 };
 
 const embedScript = document.createElement("script");

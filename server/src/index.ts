@@ -7,6 +7,7 @@ import { ToolLoopAgent, pipeAgentUIStreamToResponse, UIMessage, stepCountIs } fr
 import { anthropic } from "@ai-sdk/anthropic";
 import { systemPrompt } from "./prompt.js";
 import { agentTools } from "./tools.js";
+import * as metabase from "./metabase.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, "../../.env");
@@ -36,6 +37,16 @@ const agent = new ToolLoopAgent({
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
+});
+
+/** JWT for modular embedding (`embed.js` / `<metabase-browser>`). Returns `{ jwt }` per Metabase SDK docs. */
+app.get("/api/embed-token", (_req, res) => {
+  try {
+    res.json({ jwt: metabase.signJwt() });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    res.status(500).json({ error: message });
+  }
 });
 
 app.post("/api/chat", async (req, res) => {
