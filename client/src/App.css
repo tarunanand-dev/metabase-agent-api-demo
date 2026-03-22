@@ -31,15 +31,89 @@ body {
 
 /* --- App layout --- */
 
-.app {
+.app-shell {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  max-width: 720px;
   margin: 0 auto;
+  max-width: 1400px;
   background: var(--bg-primary);
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
+}
+
+@media (min-width: 900px) {
+  .app-shell {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.appice-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 38vh;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+@media (min-width: 900px) {
+  .appice-pane {
+    flex: 1 1 52%;
+    min-height: 0;
+    min-width: 0;
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+  }
+}
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.pane-wordmark {
+  display: block;
+  height: 1.5rem;
+  width: auto;
+  max-width: min(200px, 55vw);
+  object-fit: contain;
+  object-position: left center;
+}
+
+metabase-browser {
+  display: block;
+  flex: 1;
+  min-height: 280px;
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  metabase-browser {
+    min-height: 0;
+  }
+}
+
+.chat-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .chat-pane {
+    flex: 1 1 48%;
+    max-width: none;
+    margin: 0;
+  }
 }
 
 /* --- Header --- */
@@ -48,8 +122,21 @@ body {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border);
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.75rem;
+}
+
+.app-header-mark {
+  flex-shrink: 0;
+  border-radius: 8px;
+  display: block;
+}
+
+.app-header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
 }
 
 .app-header h1 {
