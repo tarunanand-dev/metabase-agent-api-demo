@@ -2,15 +2,6 @@
 
 import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
-interface ImportMetaEnv {
-  /** Set from `METABASE_INSTANCE_URL` in repo-root `.env` via `vite.config.ts` `define`. */
-  readonly VITE_METABASE_INSTANCE_URL: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
-
 declare global {
   interface Window {
     metabaseConfig?: {

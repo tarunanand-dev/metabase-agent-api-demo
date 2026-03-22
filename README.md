@@ -33,11 +33,11 @@ npm run install:all
 npm run dev
 ```
 
-Open [http://localhost:3100](http://localhost:3100).
+Open [http://localhost:4010](http://localhost:4010) (Vite dev server; `CLIENT_PORT` / `SERVER_PORT` in `.env` default to 4010 / 4011).
 
 ## Production build
 
-`METABASE_INSTANCE_URL` from the repo-root `.env` is mapped at build time to `import.meta.env.VITE_METABASE_INSTANCE_URL` (see `client/vite.config.ts` `define`). `main.tsx` uses that value for `window.metabaseConfig` and to load `embed.js`. Set the variable in the environment or `.env` **before** `vite build` / `npm run dev` so the client points at your real Metabase host.
+The browser loads `METABASE_INSTANCE_URL` at **runtime** from `GET /api/config` (same value the server uses for the Agent API). No Vite build-time URL is required; rebuild the static assets only when application code changes.
 
 On the **Metabase** side, typical requirements are:
 
@@ -45,7 +45,15 @@ On the **Metabase** side, typical requirements are:
 - **HTTPS** — If the app is served over HTTPS, the Metabase URL should be HTTPS too so the browser does not block mixed content when loading `embed.js`.
 - **Embedding / interactive embedding** — Enable whatever your Metabase edition needs for the embedded browser and session behavior you use (`useExistingUserSession`, JWT SSO, etc.).
 
-The Node server still reads `METABASE_INSTANCE_URL` at **runtime** for API calls; keep that value aligned with what you used at build time unless you rebuild after changing hosts.
+## Docker (nginx + API)
+
+**nginx** serves the Vite build and proxies `/api` to the Express container (`Dockerfile.api` + `Dockerfile.web`, `docker-compose.yml`). Configure secrets in `.env`, then:
+
+```sh
+docker compose up --build
+```
+
+Open the app at `http://localhost:${WEB_PORT:-4010}` (nginx listens on port **4010** in the container by default; override with `LISTEN_PORT` / `WEB_PORT`). The API is only reachable inside the Compose network; `SERVER_PORT` in `.env` must match what nginx proxies to (default `4011`).
 
 ## Branding
 
