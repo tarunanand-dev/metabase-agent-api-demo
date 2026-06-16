@@ -28,15 +28,18 @@ for (const v of requiredEnvVars) {
   }
 }
 
+const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL?.trim() || "claude-sonnet-4-6";
+
 const agent = new ToolLoopAgent({
-  model: anthropic("claude-sonnet-4-20250514"),
+  model: anthropic(ANTHROPIC_MODEL),
+  maxOutputTokens: 16_384,
   instructions: systemPrompt,
   tools: agentTools,
   stopWhen: stepCountIs(15),
 });
 
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok" });
+  res.json({ status: "ok", model: ANTHROPIC_MODEL });
 });
 
 /** Public Metabase URL for the browser (embed.js, `window.metabaseConfig`). Same source as server-side API calls. */
@@ -72,4 +75,5 @@ app.post("/api/chat", async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
+  console.log(`Anthropic model: ${ANTHROPIC_MODEL}`);
 });
